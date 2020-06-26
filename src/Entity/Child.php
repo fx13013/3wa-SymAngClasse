@@ -4,12 +4,20 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ChildRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ChildRepository::class)
- * @ApiResource
+ * @ApiResource(
+ *  collectionOperations={"GET", "POST"},
+ *  itemOperations={"GET", "PUT", "DELETE"},
+ *  normalizationContext={"groups"={"child:read"}},
+ * )
  */
 class Child
 {
@@ -18,16 +26,19 @@ class Child
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"child:read", "message:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $photo;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"child:read", "message:read"})
      * @Assert\NotBlank(message="Le prénom est obligatoire")
      * @Assert\Length(min=3, max=255, minMessage="Le prénom doit faire 3 caractères minimum", maxMessage="Le prénom doit faire 255 caractères maximum")
      */
@@ -35,6 +46,7 @@ class Child
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"child:read", "message:read"})
      * @Assert\NotBlank(message="Le nom est obligatoire")
      * @Assert\Length(min=3, max=255, minMessage="Le prénom doit faire 3 caractères minimum", maxMessage="Le prénom doit faire 255 caractères maximum")
      */
@@ -42,103 +54,141 @@ class Child
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"child:read"})
+     * @Assert\NotBlank(message="Le genre est obligatoire")
+     * @Assert\Choice(choices=Child::GENRES, message="Choisir entre Masculin ou Féminin")
      */
     private $genre;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"child:read"})
+     * @Assert\NotBlank(message="La date de naissance est obligatoire")
      */
     private $dateNaissance;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"child:read"})
+     * @Assert\NotBlank(message="L'adresse est obligatoire")
      */
     private $adresse;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Le code postal est obligatoire")
      */
     private $codePostal;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"child:read"})
+     * @Assert\NotBlank(message="La ville est obligatoire")
      */
     private $ville;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $securiteSociale;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $numeroCaf;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $assuranceScolaire;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"child:read"})
      */
     private $nombreFreres;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"child:read"})
      */
     private $nombreSoeurs;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $professionMere;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $professionPere;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $telephoneDomicile;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $telephonePere;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $telephoneMere;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $observations;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $nomMedecinTraitant;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"child:read"})
      */
     private $telephoneMedecin;
 
     /**
      * @ORM\ManyToOne(targetEntity=Classroom::class, inversedBy="students")
+     * @Assert\NotBlank(message="La classe est obligatoire")
+     * @Groups({"child:read"})
      */
     private $classroom;
 
     /**
      * @ORM\OneToOne(targetEntity=User::class, mappedBy="student", cascade={"persist", "remove"})
+     * @Groups({"child:read"})
      */
     private $user;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="child")
+     * @Groups({"child:read"})
+     * @ApiSubresource
+     */
+    private $messages;
+
+    public function __construct()
+    {
+        $this->messages = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -422,6 +472,37 @@ class Child
         $newStudent = null === $user ? null : $this;
         if ($user->getStudent() !== $newStudent) {
             $user->setStudent($newStudent);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Message[]
+     */
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): self
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages[] = $message;
+            $message->setChild($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessage(Message $message): self
+    {
+        if ($this->messages->contains($message)) {
+            $this->messages->removeElement($message);
+            // set the owning side to null (unless already changed)
+            if ($message->getChild() === $this) {
+                $message->setChild(null);
+            }
         }
 
         return $this;

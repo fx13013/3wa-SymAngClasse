@@ -5,12 +5,17 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ApiResource
+ * @ApiResource(
+ *  normalizationContext={"groups"={"user:read"}},
+ * )
+ * @UniqueEntity("email", message="Cette addresse email existe déjà")
  */
 class User implements UserInterface
 {
@@ -18,11 +23,13 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"user:read", "child:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"user:read", "child:read"})
      * @Assert\NotBlank(message="L'adresse email est obligatoire")
      * @Assert\Email(message="L'adresse email doit avoir un format valide")
      */
@@ -30,6 +37,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="json")
+     * @Groups({"user:read"})
      */
     private $roles = [];
 
@@ -48,6 +56,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user:read", "child:read"})
      * @Assert\NotBlank(message="Le nom est obligatoire")
      * @Assert\Length(min=3, max=255, minMessage="Le prénom doit faire 3 caractères minimum", maxMessage="Le prénom doit faire 255 caractères maximum")
      */
@@ -55,6 +64,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user:read", "child:read"})
      * @Assert\NotBlank(message="Le nom est obligatoire")
      * @Assert\Length(min=3, max=255, minMessage="Le prénom doit faire 3 caractères minimum", maxMessage="Le prénom doit faire 255 caractères maximum")
      */
@@ -67,6 +77,9 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=Classroom::class, inversedBy="users")
+     * @Assert\NotBlank(message="La classe est obligatoire")
+     * @Assert\Choice(choices=Classroom::LEVELS, message="La classe doit être CP, CE1, CE2, CM1, ou CM2")
+     * @Groups({"user:read"})
      */
     private $classroom;
 

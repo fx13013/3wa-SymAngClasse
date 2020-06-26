@@ -2,8 +2,10 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Annonce;
 use App\Entity\Child;
 use App\Entity\Classroom;
+use App\Entity\Message;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -32,6 +34,17 @@ class AppFixtures extends Fixture
             $classe->setName(Classroom::LEVELS[$c]);
             $classes[] = $classe;
 
+            // Annonces
+            for ($a = 0; $a < \random_int(2, 6); $a++) {
+                $annonce = new Annonce;
+                $annonce->setTitle($faker->catchPhrase)
+                    ->setContent($faker->paragraphs(\random_int(3, 7), true))
+                    ->setCreatedAt($faker->dateTimeBetween("-6 months"));
+
+                $manager->persist($annonce);
+                $classe->addAnnonce($annonce);
+            }
+
             $manager->persist($classe);
         }
 
@@ -43,7 +56,7 @@ class AppFixtures extends Fixture
                 ->setEmail("prof$p@gmail.com")
                 ->setRoles(['ROLE_PROF'])
                 ->setClassroom($classes[$p])
-                ->setPassword($this->encoder->encodePassword($prof, 'password'));
+                ->setPassword('password');
 
             $manager->persist($prof);
         }
@@ -93,6 +106,18 @@ class AppFixtures extends Fixture
                 $eleve->setNomMedecinTraitant($faker->name)
                     ->setTelephoneMedecin($faker->phoneNumber);
             }
+
+            // Messages
+            for ($m = 0; $m < \random_int(1, 4); $m++) {
+                $message = new Message;
+                $message->setTitle($faker->catchPhrase)
+                    ->setContent($faker->paragraphs(\random_int(1, 4), true))
+                    ->setCreatedAt($faker->dateTimeBetween("- 5 months"));
+
+                $manager->persist($message);
+                $eleve->addMessage($message);
+            }
+
             $manager->persist($eleve);
 
             $prenom = $eleve->getPrenom();
@@ -102,7 +127,7 @@ class AppFixtures extends Fixture
             $user->setFirstName($prenom)
                 ->setLastName($nom)
                 ->setEmail("user$u@gmail.com")
-                ->setPassword($this->encoder->encodePassword($user, 'password'));
+                ->setPassword('password');
             $user->setStudent($eleve);
 
             $manager->persist($user);

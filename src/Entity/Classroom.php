@@ -7,10 +7,13 @@ use App\Repository\ClassroomRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=ClassroomRepository::class)
- * @ApiResource
+ * @ApiResource(
+ *  normalizationContext={"groups"={"classroom:read"}},
+ * )
  */
 class Classroom
 {
@@ -19,11 +22,13 @@ class Classroom
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"classroom:read", "user:read", "child:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"classroom:read", "user:read", "child:read"})
      */
     private $name;
 
@@ -37,10 +42,16 @@ class Classroom
      */
     private $users;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Annonce::class, mappedBy="classroom")
+     */
+    private $annonces;
+
     public function __construct()
     {
         $this->students = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->annonces = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -116,6 +127,37 @@ class Classroom
             // set the owning side to null (unless already changed)
             if ($user->getClassroom() === $this) {
                 $user->setClassroom(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Annonce[]
+     */
+    public function getAnnonces(): Collection
+    {
+        return $this->annonces;
+    }
+
+    public function addAnnonce(Annonce $annonce): self
+    {
+        if (!$this->annonces->contains($annonce)) {
+            $this->annonces[] = $annonce;
+            $annonce->setClassroom($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAnnonce(Annonce $annonce): self
+    {
+        if ($this->annonces->contains($annonce)) {
+            $this->annonces->removeElement($annonce);
+            // set the owning side to null (unless already changed)
+            if ($annonce->getClassroom() === $this) {
+                $annonce->setClassroom(null);
             }
         }
 

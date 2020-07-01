@@ -22,25 +22,51 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
 
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?string $operationName = null)
     {
+        if ($resourceClass !== Message::class) {
+            return;
+        }
+
+        if ($this->security->isGranted('ROLE_PROF')) {
+            $classroom = $this->security->getUser()->getClassroom();
+            $alias = $queryNameGenerator->generateJoinAlias('message');
+            $rootAlias = $queryBuilder->getAllAliases()[0];
+            $queryBuilder->join($rootAlias . '.child', $alias)
+                ->andWhere($alias . '.classroom = :classroom')
+                ->setParameter('classroom', $classroom);
+            return;
+        }
+
+
         /** @var User */
         $user = $this->security->getUser()->getStudent();
 
-        if ($resourceClass === Message::class) {
-            $rootAlias = $queryBuilder->getAllAliases()[0];
-            $queryBuilder->andWhere("$rootAlias.child = :user")
-                ->setParameter('user', $user);
-        }
+        $rootAlias = $queryBuilder->getAllAliases()[0];
+        $queryBuilder->andWhere("$rootAlias.child = :user")
+            ->setParameter('user', $user);
     }
 
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, ?string $operationName = null, array $context = [])
     {
+        if ($resourceClass !== Message::class) {
+            return;
+        }
+
+        if ($this->security->isGranted('ROLE_PROF')) {
+            $classroom = $this->security->getUser()->getClassroom();
+            $alias = $queryNameGenerator->generateJoinAlias('message');
+            $rootAlias = $queryBuilder->getAllAliases()[0];
+            $queryBuilder->join($rootAlias . '.child', $alias)
+                ->andWhere($alias . '.classroom = :classroom')
+                ->setParameter('classroom', $classroom);
+            return;
+        }
+
+
         /** @var User */
         $user = $this->security->getUser()->getStudent();
 
-        if ($resourceClass === Message::class) {
-            $rootAlias = $queryBuilder->getAllAliases()[0];
-            $queryBuilder->andWhere("$rootAlias.child = :user")
-                ->setParameter('user', $user);
-        }
+        $rootAlias = $queryBuilder->getAllAliases()[0];
+        $queryBuilder->andWhere("$rootAlias.child = :user")
+            ->setParameter('user', $user);
     }
 }

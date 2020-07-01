@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=AnnonceRepository::class)
- * @ApiResource
+ * @ApiResource(attributes={"order"={"createdAt":"DESC"}})
  */
 class Annonce
 {

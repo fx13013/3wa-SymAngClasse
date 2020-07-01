@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des classes{% endblock %}
+
+{% block body %}
+    <main class="container mt-3">
+        <h1>Liste des classes ({{classes | length }})</h1>
+        <div class="row">
+            <a href="{{path('admin_classroom_create')}}" class="btn btn-primary ml-auto mb-3">Ajouter une classe</a>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Id</td>
+                    <td>Nom</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+            {% for classe in classes %}
+                <tr>
+                    <td>#{{classe.id}}</td>
+                    <td>{{classe.name}}</td>
+                    <td>
+                        <a href="{{path('admin_classroom_edit', {id: classe.id})}}" class="btn btn-info">Modifier</a>
+                        <a href="{{path('admin_classroom_delete', {id: classe.id})}}" class="btn btn-warning">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </main>
+{% endblock %}

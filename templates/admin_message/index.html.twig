@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des messages{% endblock %}
+
+{% block body %}
+    <main class="container mt-3">
+        <h1>Liste des messages ({{ messages | length }})</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Id</td>
+                    <td>Classe</td>
+                    <td>Auteur</td>
+                    <td>Titre</td>
+                    <td>Crée le</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in messages %}
+                    <tr>
+                        <td>#{{message.id}}</td>
+                        <td>{{message.child.classroom.name}}</td>
+                        <td>{{message.child.nom | upper}} {{message.child.prenom}}</td>
+                        <td>{{message.title}}</td>
+                        <td>{{message.createdAt | date('d/m/Y')}}</td>
+                        <td>
+                            <a href="{{path('admin_message_edit', {id: message.id})}}" class="btn btn-info">Modifier</a>
+                            <a href="{{path('admin_message_delete', {id: message.id})}}" class="btn btn-warning">Supprimer</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+{% endblock %}

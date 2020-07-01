@@ -14,6 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ApiResource(
  *  normalizationContext={"groups"={"user:read"}},
+ *  denormalizationContext={"groups"={"user:write"}}
  * )
  * @UniqueEntity("email", message="Cette addresse email existe déjà")
  */
@@ -29,7 +30,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"user:read", "child:read"})
+     * @Groups({"user:read", "child:read", "user:write"})
      * @Assert\NotBlank(message="L'adresse email est obligatoire")
      * @Assert\Email(message="L'adresse email doit avoir un format valide")
      */
@@ -46,17 +47,19 @@ class User implements UserInterface
      * @ORM\Column(type="string")
      * @Assert\NotBlank(message="Le mot de passe est obligatoire")
      * @Assert\Length(min=8, minMessage="Le mot de passe doit faire 8 caractères au minimum")
+     * @Groups("user:write")
      */
     private $password;
 
     /**
      * @Assert\EqualTo(propertyPath="password", message="La confirmation n'est pas identique au mot de passe")
+     * @Groups("user:write")
      */
     private $confirmation;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user:read", "child:read"})
+     * @Groups({"user:read", "child:read", "user:write"})
      * @Assert\NotBlank(message="Le nom est obligatoire")
      * @Assert\Length(min=3, max=255, minMessage="Le prénom doit faire 3 caractères minimum", maxMessage="Le prénom doit faire 255 caractères maximum")
      */
@@ -64,7 +67,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user:read", "child:read"})
+     * @Groups({"user:read", "child:read", "user:write"})
      * @Assert\NotBlank(message="Le nom est obligatoire")
      * @Assert\Length(min=3, max=255, minMessage="Le prénom doit faire 3 caractères minimum", maxMessage="Le prénom doit faire 255 caractères maximum")
      */
@@ -72,12 +75,13 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToOne(targetEntity=Child::class, inversedBy="user", cascade={"persist", "remove"})
+     * @Groups("user:write")
+     * @Assert\Valid()
      */
     private $student;
 
     /**
      * @ORM\ManyToOne(targetEntity=Classroom::class, inversedBy="users")
-     * @Assert\NotBlank(message="La classe est obligatoire")
      * @Assert\Choice(choices=Classroom::LEVELS, message="La classe doit être CP, CE1, CE2, CM1, ou CM2")
      * @Groups({"user:read"})
      */

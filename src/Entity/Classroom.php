@@ -28,7 +28,7 @@ class Classroom
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"classroom:read", "user:read", "child:read"})
+     * @Groups({"classroom:read", "user:read", "child:read", "message:read"})
      */
     private $name;
 

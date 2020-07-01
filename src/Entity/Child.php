@@ -32,13 +32,13 @@ class Child
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $photo;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"child:read", "message:read"})
+     * @Groups({"child:read", "message:read", "user:write"})
      * @Assert\NotBlank(message="Le prénom est obligatoire")
      * @Assert\Length(min=3, max=255, minMessage="Le prénom doit faire 3 caractères minimum", maxMessage="Le prénom doit faire 255 caractères maximum")
      */
@@ -46,7 +46,7 @@ class Child
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"child:read", "message:read"})
+     * @Groups({"child:read", "message:read", "user:write"})
      * @Assert\NotBlank(message="Le nom est obligatoire")
      * @Assert\Length(min=3, max=255, minMessage="Le prénom doit faire 3 caractères minimum", maxMessage="Le prénom doit faire 255 caractères maximum")
      */
@@ -54,7 +54,7 @@ class Child
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      * @Assert\NotBlank(message="Le genre est obligatoire")
      * @Assert\Choice(choices=Child::GENRES, message="Choisir entre Masculin ou Féminin")
      */
@@ -62,113 +62,114 @@ class Child
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      * @Assert\NotBlank(message="La date de naissance est obligatoire")
      */
     private $dateNaissance;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      * @Assert\NotBlank(message="L'adresse est obligatoire")
      */
     private $adresse;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"child:read", "user:write"})
      * @Assert\NotBlank(message="Le code postal est obligatoire")
      */
     private $codePostal;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      * @Assert\NotBlank(message="La ville est obligatoire")
      */
     private $ville;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $securiteSociale;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $numeroCaf;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $assuranceScolaire;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $nombreFreres;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $nombreSoeurs;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $professionMere;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $professionPere;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $telephoneDomicile;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $telephonePere;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $telephoneMere;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $observations;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $nomMedecinTraitant;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "user:write"})
      */
     private $telephoneMedecin;
 
     /**
      * @ORM\ManyToOne(targetEntity=Classroom::class, inversedBy="students")
      * @Assert\NotBlank(message="La classe est obligatoire")
-     * @Groups({"child:read"})
+     * @Groups({"child:read", "message:read", "user:write"})
      */
     private $classroom;
 
@@ -181,7 +182,6 @@ class Child
     /**
      * @ORM\OneToMany(targetEntity=Message::class, mappedBy="child")
      * @Groups({"child:read"})
-     * @ApiSubresource
      */
     private $messages;
 

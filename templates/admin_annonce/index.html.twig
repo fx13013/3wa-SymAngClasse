@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des annonces{% endblock %}
+
+{% block body %}
+    <main class="container mt-2">
+        <h1>Liste des annonces</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Classe</th>
+                    <th>titre</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for annonce in annonces %}
+                    <tr>
+                        <td>#{{annonce.id}}</td>
+                        <td>{{annonce.classroom.name}}</td>
+                        <td>{{annonce.title}}</td>
+                        <td>
+                            <a href="{{path('admin_annonce_edit', {id:annonce.id})}}" class="btn btn-info">Modifier</a>
+                            <a href="{{path('admin_annonce_delete', {id:annonce.id})}}" class="btn btn-warning">Supprimer</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Modifier un message{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="mt-3">Modifier un message</h1>
+        {{form_start(messageForm)}}
+        {{form_widget(messageForm)}}
+        <button type="submit" class="btn btn-primary">Modifier</button>
+        {{form_end(messageForm)}}
+    </div>
+{% endblock %}

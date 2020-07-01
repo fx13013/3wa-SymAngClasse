@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass=MessageRepository::class)
  * @ApiResource(
  *  normalizationContext={"groups"={"message:read"}},
+ *  attributes={"order"={"createdAt":"DESC"}}
  * )
  */
 class Message
